@@ -42,10 +42,9 @@ const Edit = () => {
     handleSubmit,
     formState: { errors },
     reset,
-    resetField,
     control,
   } = useForm({
-    // resolver: zodResolver(addCategorySchema),
+    resolver: zodResolver(addCategorySchema),
   });
 
   const handleImageChange = (event) => {
@@ -89,7 +88,6 @@ const Edit = () => {
 
         dispatch(setCategories(categoriesData));
       } catch (err) {
-        console.log(err);
         toast.error(err?.data?.msg || err.error || "Something went wrong");
       }
     };
@@ -110,10 +108,8 @@ const Edit = () => {
       if (data.description) formData.append("description", data.description);
 
       if (data.image && typeof data.image !== "string") {
-        console.log("file");
         formData.append("image", data.image[0]);
       } else if (typeof imagePreview == "string") {
-        console.log("string");
         formData.append("image", imagePreview);
       }
 
@@ -122,7 +118,7 @@ const Edit = () => {
       await post(api.CATEGORIES + `/` + id, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      // navigate("/admin/categories");
+      navigate("/admin/categories");
     } catch (error) {
       toast.error(error.data.msg);
     }

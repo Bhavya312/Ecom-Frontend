@@ -1,10 +1,11 @@
+import CategoryList from '../components/CategoryList'
 import Slider from '../components/Slider'
-import React from 'react'
 
 const Home = () => {
   return (
     <>
      <Slider />
+     <CategoryList />
     </>
   )
 }

@@ -2,23 +2,25 @@ import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import previewImage from "../../public/homeslider/preview.webp"; 
+import pbg from "../../public/homeslider/purple-background.jpg"; 
 
 const slides = [
   {
     id: 1,
-    image: "https://images.unsplash.com/",
-    title: "Latest Tech Arrivals",
-    caption: "Upgrade your life with cutting-edge gadgets",
+    image: previewImage,
+    title: "Trendy Fashion",
+    caption: "Discover classic and modern clothing like never before.", 
   },
   {
     id: 2,
-    image: "https://source.unsplash.com/1600x600/?fashion",
+    image: pbg,
     title: "Trendy Fashion",
     caption: "Stay ahead with our latest clothing collections",
   },
   {
     id: 3,
-    image: "https://source.unsplash.com/1600x600/?food",
+    image: pbg,
     title: "Delicious & Fresh",
     caption: "Tasty meals delivered to your doorstep",
   },
