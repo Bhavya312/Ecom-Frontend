@@ -43,6 +43,8 @@ const Edit = () => {
     formState: { errors },
     reset,
     control,
+    watch,
+    // setValue
   } = useForm({
     resolver: zodResolver(addCategorySchema),
   });
@@ -92,7 +94,7 @@ const Edit = () => {
       }
     };
     fetchData();
-  }, [dispatch, id]);
+  }, [dispatch, reset, id]);
 
   const { categories } = useSelector((state) => state.categories);
 
@@ -100,25 +102,23 @@ const Edit = () => {
     const selectedCategory = categories.find((cat) => cat.id === Number(value));
     setSelectedCategory(selectedCategory);
   };
-
   const onSubmit = async (data) => {
     try {
-      const formData = new FormData();
-      formData.append("name", data.name);
-      if (data.description) formData.append("description", data.description);
+        const formData = new FormData();
+        formData.append("name", data.name);
+        if (data.description) formData.append("description", data.description);
 
-      if (data.image && typeof data.image !== "string") {
-        formData.append("image", data.image[0]);
-      } else if (typeof imagePreview == "string") {
-        formData.append("image", imagePreview);
-      }
+        if (data.image && typeof data.image !== "string") {
+          formData.append("image", data.image[0]);
+        } else if (typeof imagePreview == "string") {
+          formData.append("image", imagePreview);
+        }
+        formData.append("parent_id", selectedCategory?.id ?? "");
 
-      formData.append("parent_id", selectedCategory?.id ?? "");
-
-      await post(api.CATEGORIES + `/` + id, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      navigate("/admin/categories");
+        await post(api.CATEGORIES + `/` + id, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        navigate("/admin/categories");
     } catch (error) {
       toast.error(error.data.msg);
     }
@@ -131,7 +131,11 @@ const Edit = () => {
         <CardTitle className="text-center">Edit Category</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-4"
+          encType="multipart/form-data"
+        >
           {/* Name Input */}
           <div>
             <Label htmlFor="name">Name</Label>

@@ -84,14 +84,14 @@ const Add = () => {
       const formData = new FormData();
       formData.append("name", data.name);
       if (data.description) formData.append("description", data.description);
-      if (data.image[0]) formData.append("image", data.image[0]);
-      if (selectedCategory.id) formData.append("parent_id", selectedCategory.id);
+      if (data.image && data.image[0]) formData.append("image", data.image[0]);
+      if (selectedCategory && selectedCategory.id) formData.append("parent_id", selectedCategory.id);
       await post(api.CATEGORIES, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       navigate("/admin/categories");
-    } catch (error) {
-      toast.error(error.data.msg);
+    } catch (err) {
+      toast.error(err?.data?.msg || err.error || "Something went wrong");
     }
   };
   if (loading) return <Loader />;
@@ -151,7 +151,7 @@ const Add = () => {
           </div>
 
           {/* Image Upload */}
-          <div>
+          <div className={imagePreview ? `hidden` : `block`}>
             <Label htmlFor="image">Image</Label>
             <Input
               id="image"
