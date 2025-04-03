@@ -12,9 +12,6 @@ function App() {
       <ToastContainer position="bottom-right" />
       <Navigation />
       <CommonRoutes />
-      {/* <PublicRoutes />
-      <UserRoutes />
-      <AdminRoutes /> */}
       <Footer />
     </>
   );

@@ -3,6 +3,7 @@ import authReducer from './features/auth/authSlice';
 import loadingReducer from './features/loadingSlice'
 import errorReducer from './features/errorSlice'
 import categoryReducer from './api/categorySlice'
+import productReducer from './api/productSlice'
 import confirmModelReducer from './api/confirmModelSlice'
 import { apiSlice } from "./api/apiSlice";
 import { setupListeners } from "@reduxjs/toolkit/query";
@@ -14,6 +15,7 @@ const store = configureStore({
     loading: loadingReducer,
     error: errorReducer,
     categories: categoryReducer,
+    products: productReducer,
     confirmModel: confirmModelReducer,
   },
 

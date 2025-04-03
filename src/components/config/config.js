@@ -24,5 +24,6 @@ export const api = {
   BASE:'/',
   LOGIN: '/auth/login',
   REGISTER: '/auth/register',
-  CATEGORIES: '/categories'
+  CATEGORIES: '/categories',
+  PRODUCTS: '/products'
 }

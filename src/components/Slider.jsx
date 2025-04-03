@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "./ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import previewImage from "../../public/homeslider/preview.webp"; 
-import pbg from "../../public/homeslider/purple-background.jpg"; 
+import previewImage from "../../src/assets/homeslider/preview.webp"; 
+import pbg from "../../src/assets/homeslider/purple-background.jpg"; 
 
 const slides = [
   {
