@@ -1,11 +1,13 @@
-import CategoryList from '../components/CategoryList'
-import Slider from '../components/Slider'
+import CategoryList from '../components/Categories'
+import Slider from '../components/BannerSlider'
+import ProductList from '../components/ProductList'
 
 const Home = () => {
   return (
     <>
      <Slider />
      <CategoryList />
+     <ProductList />
     </>
   )
 }

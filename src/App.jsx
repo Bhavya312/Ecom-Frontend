@@ -2,7 +2,7 @@ import "./App.css";
 import { ToastContainer } from "react-toastify";
 import Navigation from "./pages/Auth/Navigation";
 import { Outlet, Router} from "react-router-dom";
-import Slider from "./components/Slider";
+import Slider from "./components/BannerSlider";
 import CommonRoutes from "./routes/CommonRoutes";
 import Footer from "./components/Footer";
 

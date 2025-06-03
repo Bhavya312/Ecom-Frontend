@@ -26,7 +26,7 @@ const slides = [
   },
 ];
 
-const Slider = () => {
+const BannerSlider = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const nextSlide = () => {
@@ -97,4 +97,4 @@ const Slider = () => {
   );
 };
 
-export default Slider
+export default BannerSlider

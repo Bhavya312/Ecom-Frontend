@@ -35,6 +35,11 @@ const Navigation = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/categories/1" className="text-white hover:text-gray-300">
+                  Categories
+                </Link>
+              </li>
+              <li>
                 <Link to="/products" className="text-white hover:text-gray-300">
                   Products
                 </Link>

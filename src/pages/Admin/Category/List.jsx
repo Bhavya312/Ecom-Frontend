@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { api, del, get } from "../../../components/config/config";
 import { deleteCategory, setCategories } from "../../../redux/api/categorySlice";
@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   useReactTable,
   getCoreRowModel,
+  getPaginationRowModel,
 } from "@tanstack/react-table";
 import Loader from "../../../components/Loader";
 import ListComponent from "../../../components/ListComponent";
@@ -19,7 +20,13 @@ const List = () => {
   const { categories } = useSelector((state) => state.categories);
   const { loading } = useSelector((state) => state.loading);
   const { isOpen } = useSelector((state) => state.confirmModel);
+  const [pagination, setPagination] = useState({
+                                                pageIndex: 1,
+                                                pageSize: 10,
+                                              });
 
+  const [limit, setLimit] = useState(10);
+  const [page, setPage] = useState(1);
   const columns = useMemo(
     () => [
       { accessorKey: "id", header: "ID" },
@@ -32,19 +39,24 @@ const List = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await get(api.CATEGORIES);
+        const response = await get(api.CATEGORIES, {params:{'limit':limit, "page":page}});
         dispatch(setCategories(response.data.data));
       } catch (err) {
         toast.error(err?.data?.msg || err.error || "Something went wrong");
       }
     };
     fetchCategories();
-  }, [dispatch]);
+  }, [dispatch, limit, page]);
 
-  const data = useReactTable({
-    data: categories || [],
+  const table = useReactTable({
+    data: categories.data || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
+    state: {
+      pagination,
+    },
   });
 
   const handleDelte = async (id) => {
@@ -70,9 +82,13 @@ const List = () => {
       </div>
 
       <ListComponent
-        data={data}
+        table={table}
         route="categories"
         message="Are you sure you want to delete this Category"
+        setLimit={setLimit}
+        setPage={setPage}
+        page={page}
+        totalRecords={categories?.totalRows}
       />
     </div>
     </>

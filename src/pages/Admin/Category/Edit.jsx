@@ -19,9 +19,9 @@ import {
   CardHeader,
   CardTitle,
 } from "../../../components/ui/card";
-import { api, get, patch, post } from "../../../components/config/config";
+import { api, get, post } from "../../../components/config/config";
 import { X } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setCategories } from "../../../redux/api/categorySlice";
@@ -34,6 +34,7 @@ const Edit = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const { loading } = useSelector((state) => state.loading);
+  const { token } = JSON.parse(localStorage.getItem('userInfo'));
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -67,29 +68,30 @@ const Edit = () => {
       try {
         const category = await get(api.CATEGORIES + `/` + id);
         const categories = await get(api.CATEGORIES);
-
+        
         const { image } = category.data.data;
         setImagePreview(image);
         reset(category.data.data);
 
         const selectedCategory = category
-          ? categories.data.data.find(
+          ? categories.data.data.data.find(
               (cat) => cat.id === category.data.data.parent_id
             )
           : null;
-
+        
         setSelectedCategory(selectedCategory);
 
         const currentCategory = category
-          ? categories.data.data.find((cat) => cat.id === category.data.data.id)
+          ? categories.data.data.data.find((cat) => cat.id === category.data.data.id)
           : null;
 
         const categoriesData = category
-          ? categories.data.data.filter((cat) => cat.id !== currentCategory.id)
-          : categories.data.data;
-
+          ? categories.data.data.data.filter((cat) => cat.id !== currentCategory.id)
+          : categories.data.data.data;
+        
         dispatch(setCategories(categoriesData));
       } catch (err) {
+        console.log(err);
         toast.error(err?.data?.msg || err.error || "Something went wrong");
       }
     };
@@ -116,10 +118,11 @@ const Edit = () => {
         formData.append("parent_id", selectedCategory?.id ?? "");
 
         await post(api.CATEGORIES + `/` + id, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: { "Content-Type": "multipart/form-data", "Authorization": `Bearer ${token}` },
         });
         navigate("/admin/categories");
     } catch (error) {
+      console.log(error)
       toast.error(error.data.msg);
     }
   };

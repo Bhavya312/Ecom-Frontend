@@ -33,7 +33,8 @@ const Add = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const { loading } = useSelector((state) => state.loading);
-
+  const { token } = JSON.parse(localStorage.getItem('userInfo'));
+  
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
@@ -75,7 +76,7 @@ const Add = () => {
   const { categories } = useSelector((state) => state.categories);
 
   const handleCategoryChange = useCallback((value) => {
-    const selectedCategory = categories.find((cat) => cat.id === Number(value));
+    const selectedCategory = categories.data.find((cat) => cat.id === Number(value));
     setSelectedCategory(selectedCategory);
   }, [categories]);
 
@@ -87,7 +88,7 @@ const Add = () => {
       if (data.image && data.image[0]) formData.append("image", data.image[0]);
       if (selectedCategory && selectedCategory.id) formData.append("parent_id", selectedCategory.id);
       await post(api.CATEGORIES, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { "Content-Type": "multipart/form-data", "Authorization": `Bearer ${token}`},
       });
       navigate("/admin/categories");
     } catch (err) {
@@ -128,7 +129,7 @@ const Add = () => {
                       </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    {categories?.map((category) => (
+                    {categories.data?.map((category) => (
                       <SelectItem key={category.id} value={category.id}>
                         {category.name}
                       </SelectItem>

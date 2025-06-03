@@ -30,7 +30,7 @@ const CommonRoutes = () => {
       <Route path="/" element={<Home />} />
       <Route path="/products" element={<ProductList />} />
       <Route path="/product/:id" element={<ProductDetail />} />
-      <Route path="/category/:id" element={<Category />} />
+      <Route path="/categories/:id" element={<Category />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/login" element={<Login />} />
