@@ -38,6 +38,27 @@ const Cart = () => {
     setCartItems((items) => items.filter((item) => item.id !== id));
   };
 
+  const quantityUpdate = async (id, quantity, curQuantity) => {
+    const formData = {
+      product_id: id,
+      quantity: parseInt(quantity),
+    };
+
+    if (quantity > 0 && quantity != curQuantity) {
+      const type = quantity > curQuantity ? 1 : 0;
+      formData.cart_id = cart?.id;
+      formData.type = type;
+      
+      const cartUpdate = await post(api.CARTS + "/update", formData, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userInfo?.token}`,
+        },
+      });
+      dispatch(updateCart(cartUpdate.data.data));
+    }
+  };
+
   const getTotal = () =>
     cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
@@ -63,7 +84,15 @@ const Cart = () => {
                   />
                   <div>
                     <h3 className="font-semibold">{item.name}</h3>
-                    <Input defaultValue={item.quantity} className="w-14 h-7" min={1} type="number" />
+                    <Input
+                      defaultValue={item.quantity}
+                      className="w-16 h-7"
+                      min={1}
+                      type="number"
+                      onBlur={(e) =>
+                        quantityUpdate(item.id, e.target.value, item.quantity)
+                      }
+                    />
                     <p className="text-sm font-medium text-gray-600">
                       ₹{item.price}
                     </p>
