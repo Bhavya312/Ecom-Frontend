@@ -25,5 +25,8 @@ export const api = {
   LOGIN: '/auth/login',
   REGISTER: '/auth/register',
   CATEGORIES: '/categories',
-  PRODUCTS: '/products'
+  PRODUCTS: '/products',
+  USERS: '/users',
+  PROFILE: '/profile',
+  CARTS: '/carts',
 }

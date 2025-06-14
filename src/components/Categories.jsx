@@ -13,7 +13,7 @@
       const fetchData = async () => {
         try{
           if(!categories.data){
-            const categoriesData = await get(api.CATEGORIES, {params:{'limit':10, "page":1}});
+            const categoriesData = await get(api.CATEGORIES, {params:{'limit':4, "page":1, "sort_order":"asc"}});
             dispatch(setCategories(categoriesData.data.data));
           }
         }catch(err){

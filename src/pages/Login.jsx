@@ -16,7 +16,6 @@ const Login = () => {
   const navigate = useNavigate();
 
   const { loading } = useSelector((state) => state.loading);
-  // const { error } = useSelector((state) => state.error);
   const { userInfo } = useSelector((state) => state.auth);
   const { search } = useLocation();
 
@@ -45,6 +44,7 @@ const Login = () => {
   const submitHandler = async (data) => {
     try {
       const res = await post(api.LOGIN, { ...data });
+
       dispatch(setCredentials({ ...res.data }));
       dispatch(setLoading(false));
       navigate(redirect);

@@ -20,17 +20,17 @@ const Category = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-          const response = await get(api.CATEGORIES + `/` + id);
-          setCategory(response.data.data);
-          const categoriesData = await get(api.CATEGORIES, {
-            params: { limit: 10, page: 1, ...(id && { parent_id: id }) },
-          });
-          dispatch(setCategories(categoriesData.data.data));
+        const response = await get(api.CATEGORIES + `/` + id);
+        setCategory(response.data.data);
+        const categoriesData = await get(api.CATEGORIES, {
+          params: { limit: 10, page: 1, ...(id && { parent_id: id }) },
+        });
+        dispatch(setCategories(categoriesData.data.data));
 
-          const productsData = await get(api.PRODUCTS, {
-            params: {limit: 10, page: 1},
-          });
-          dispatch(setProducts(productsData.data.data));
+        const productsData = await get(api.PRODUCTS, {
+          params: { limit: 10, page: 1, category_id: id },
+        });
+        dispatch(setProducts(productsData.data.data));
       } catch (err) {
         toast.error(err?.data?.msg || err.error || "Something went wrong");
       }
@@ -39,13 +39,14 @@ const Category = () => {
   }, [dispatch, id]);
 
   const { categories } = useSelector((state) => state.categories);
+  const { products } = useSelector((state) => state.products);
 
   if (loading) return <Loader />;
   return (
     <>
       <Banner name={category.name} catImage={category?.image} />
-      <SubCategories parentCat={category} categories={categories} />
-      <Products />
+      <SubCategories categories={categories} />
+      <Products products={products} />
     </>
   );
 };

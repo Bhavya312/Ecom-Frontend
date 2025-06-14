@@ -1,10 +1,10 @@
-import React from 'react'
+import Banner from '../components/Banner'
 
 const NotFound = () => {
   return (
-    <div>
-      NotFound
-    </div>
+    <>
+      <Banner name={'Page Not Found'} />
+    </>
   )
 }
 

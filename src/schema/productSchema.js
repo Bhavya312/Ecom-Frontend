@@ -10,11 +10,12 @@ const addProductSchema = z.object({
     z.string().transform((x) => x.replace(/[^0-9.-]+/g, "")),
     z.number(),
   ]),
-  quantity: z.union([
-    z.string().transform((x) => x.replace(/[^0-9.-]+/g, "")),
-    z.number(),
-  ]),
+  quantity: z.coerce.number().gte(1, { message: "Quantity must be greater than or equal to 1" }),
   sku: z.string().optional(),
+  categories: z.array(z.string()),
 }).passthrough();
 
-export { addProductSchema } 
+const addToCartSchema = z.object({
+    quantity: z.coerce.number().gte(1, { message: "Invalid Quantity" }),
+});
+export { addProductSchema, addToCartSchema } 

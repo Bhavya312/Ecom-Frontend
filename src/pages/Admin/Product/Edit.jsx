@@ -26,13 +26,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setCategories } from "../../../redux/api/categorySlice";
 import Loader from "../../../components/Loader";
-import { addCategorySchema } from "../../../schema/categorySchema";
 import { ErrorMessage } from "@hookform/error-message";
+import { addProductSchema } from "../../../schema/productSchema";
 
 const Edit = () => {
   let { id } = useParams();
   const [imagePreview, setImagePreview] = useState(null);
   const { loading } = useSelector((state) => state.loading);
+  const { token } = JSON.parse(localStorage.getItem('userInfo'));
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -43,7 +44,7 @@ const Edit = () => {
     reset,
     control,
   } = useForm({
-    resolver: zodResolver(addCategorySchema),
+    resolver: zodResolver(addProductSchema),
   });
 
   const handleImageChange = (event) => {
@@ -59,40 +60,67 @@ const Edit = () => {
     reset({ image: "" });
   };
 
+  const { categories } = useSelector((state) => state.categories);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const product = await get(api.PRODUCTS + `/` + id);
-        const { image } = product.data.data;
-        setImagePreview(image);
-        reset(product.data.data);
+        const productData = product.data.data;
+        const { image } = productData;
+        if(!image.includes('default')){
+          setImagePreview(image);
+        }
+        reset(productData);
+
+        if (productData.categories) {
+          const categoryIds = productData.categories.map((category) => {
+            return category.id.toString();
+          });
+          delete productData.categories;
+          reset({ categories: categoryIds, ...productData });
+        }
+
+        if (!categories.data) {
+          const categoriesData = await get(api.CATEGORIES, {
+            params: { sort_order: "asc" },
+          });
+          dispatch(setCategories(categoriesData.data.data));
+        }
       } catch (err) {
+        console.log(err);
+
         toast.error(err?.data?.msg || err.error || "Something went wrong");
       }
     };
     fetchData();
-  }, [dispatch, reset, id]);
+  }, [dispatch, reset, id, categories]);
 
   const onSubmit = async (data) => {
     try {
-        const formData = new FormData();
-        formData.append("name", data.name);
-        if (data.description) formData.append("description", data.description);
+      const formData = new FormData();
+      formData.append("name", data.name);
+      if (data.description) formData.append("description", data.description);
 
-        if (data.image && typeof data.image !== "string") {
-          formData.append("image", data.image[0]);
-        } else if (typeof imagePreview == "string") {
-          formData.append("image", imagePreview);
-        }
+      if (data.image && typeof data.image !== "string") {
+        formData.append("image", data.image[0]);
+      } else if (typeof imagePreview == "string") {
+        formData.append("image", imagePreview);
+      }
 
-        if(data.price) formData.append("price", data.price);
-        if(data.quantity) formData.append("quantity", data.quantity);
-        if(data.sku)  formData.append("sku", data.sku);
-
-        await post(api.PRODUCTS + `/` + id, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
+      if (data.price) formData.append("price", data.price);
+      if (data.quantity) formData.append("quantity", data.quantity);
+      if (data.sku) formData.append("sku", data.sku);
+      if (data.categories){
+        data.categories.map((id, index) => {
+          formData.append(`category_id[${index}]`, id);
         });
-        navigate("/admin/products");
+      }
+
+      await post(api.PRODUCTS + `/` + id, formData, {
+        headers: { "Content-Type": "multipart/form-data", "Authorization": `Bearer ${token}` },
+      });
+      navigate("/admin/products");
     } catch (error) {
       toast.error(error.data.msg);
     }
@@ -111,7 +139,7 @@ const Edit = () => {
           encType="multipart/form-data"
         >
           <div>
-          <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">Name</Label>
             <Input
               type="text"
               id="name"
@@ -153,14 +181,31 @@ const Edit = () => {
 
           <div>
             <Label htmlFor="sku">Sku</Label>
-            <Input
-              id="sku"
-              {...register("sku")}
-              placeholder="Enter sku"
-            />
+            <Input id="sku" {...register("sku")} placeholder="Enter sku" />
             <ErrorMessage errors={errors} name="sku" />
           </div>
 
+          <div className="py-7">
+            <Label htmlFor="categories">Categories</Label>
+            <div className="overflow-y-scroll h-30 mt-5">
+              <ul>
+                {categories.data &&
+                  categories.data.map((category) => (
+                    <li key={category.id} className="flex justify-left">
+                      <input
+                        type="checkbox"
+                        value={category.id}
+                        id={category.id}
+                        {...register("categories", { valueAsArray: true })}
+                        className="mr-5 mb-2"
+                      />
+                      <Label htmlFor={`${category.id}`}>{category?.name}</Label>
+                    </li>
+                  ))}
+              </ul>
+              <ErrorMessage errors={errors} name="categories" />
+            </div>
+          </div>
           <div className={imagePreview ? `hidden` : `block`}>
             <Label htmlFor="image">Image</Label>
             <Input

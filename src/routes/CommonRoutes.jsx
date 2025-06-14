@@ -13,15 +13,20 @@ import Register from "../pages/Register";
 import NotFound from "../pages/NotFound";
 import UserDashboard from "../pages/UserDashboard";
 import { AdminAddProduct, AdminProducts, AdminEditProduct } from "../pages/Admin/Product";
+import Profile from "../pages/Profile";
 
 const AdminProtectedRoute = () => {
   const { userInfo } = useSelector((state) => state.auth);
   return userInfo?.user?.role === 'Admin' ? <Outlet /> : <Navigate to="/" replace />;
 };
 
-const ProtectedRoute = () => {
-  const { userinfo } = useSelector((state) => state.auth);
-  return userinfo ? <Outlet /> : <Navigate to="/login" replace />;
+const ProtectedRoute = ({checkAdmin = null}) => {
+  const { userInfo } = useSelector((state) => state.auth);
+  if(checkAdmin && userInfo){
+    return userInfo?.user?.role === 'Admin' ? <Outlet /> : <Navigate to="/" replace />;
+  } else if(userInfo){
+    return userInfo ? <Outlet /> : <Navigate to="/login" replace />;
+  }
 };
 
 const CommonRoutes = () => {
@@ -35,15 +40,15 @@ const CommonRoutes = () => {
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="*" element={<NotFound />} />
 
       <Route element={<ProtectedRoute />}>
+      <Route path="/profile" element={<Profile />} />
         <Route path="/dashboard" element={<UserDashboard />} />
         {/* <Route path="/orders" element={<OrderHistory />} />
         <Route path="/wishlist" element={<Wishlist />} /> */}
       </Route>
       
-      <Route element={<AdminProtectedRoute />}>
+      <Route element={<ProtectedRoute checkAdmin={1} />}>
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/categories" element={<AdminCategory />} />
         <Route path="/admin/categories/add" element={<AdminAddCategory />} />
@@ -54,6 +59,8 @@ const CommonRoutes = () => {
         {/* <Route path="/admin/orders" element={<OrderManagement />} />
         <Route path="/admin/users" element={<UserManagement />} /> */}
       </Route>
+
+      <Route path="*" element={<NotFound />} />
     </Routes>
   )
 }

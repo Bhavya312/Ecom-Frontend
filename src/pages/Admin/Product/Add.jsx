@@ -12,19 +12,24 @@ import {
   CardHeader,
   CardTitle,
 } from "../../../components/ui/card";
-import { api, post } from "../../../components/config/config";
+import { api, get, post } from "../../../components/config/config";
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 // import { setProducts } from "../../../redux/api/productSlice";
 import Loader from "../../../components/Loader";
 import { addProductSchema } from "../../../schema/productSchema";
 import { ErrorMessage } from "@hookform/error-message";
+import { setCategories } from "../../../redux/api/categorySlice";
 
 const Add = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const { loading } = useSelector((state) => state.loading);
+  const { userInfo } = useSelector((state) => state.auth);
+  const token = userInfo.token;
+  
+  const dispatch = useDispatch();
 
   const navigate = useNavigate();
   const {
@@ -44,6 +49,23 @@ const Add = () => {
     }
   };
 
+  const { categories } = useSelector((state) => state.categories);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (!categories.data) {
+          const categoriesData = await get(api.CATEGORIES, {
+            params: { sort_order: "asc" },
+          });
+          dispatch(setCategories(categoriesData.data.data));
+        }
+      } catch (err) {
+        toast.error(err?.data?.msg || err.error || "Something went wrong");
+      }
+    };
+    fetchData();
+  }, [categories, dispatch]);
+
   const removeImage = () => {
     setImagePreview(null);
     reset({
@@ -55,13 +77,19 @@ const Add = () => {
     try {
       const formData = new FormData();
       formData.append("name", data.name);
-      if(data.description) formData.append("description", data.description);
-      if(data.image && data.image[0])  formData.append("image", data.image[0]);
-      if(data.price) formData.append("price", data.price);
-      if(data.quantity) formData.append("quantity", data.quantity);
-      if(data.sku)  formData.append("sku", data.sku);
+      if (data.description) formData.append("description", data.description);
+      if (data.image && data.image[0]) formData.append("image", data.image[0]);
+      if (data.price) formData.append("price", data.price);
+      if (data.quantity) formData.append("quantity", data.quantity);
+      if (data.sku) formData.append("sku", data.sku);
+      if (data.categories){
+        data.categories.map((id, index) => {
+          formData.append(`category_id[${index}]`, id);
+        });
+      }
+
       await post(api.PRODUCTS, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { "Content-Type": "multipart/form-data", "Authorization": `Bearer ${token}` },
       });
       navigate("/admin/products");
     } catch (err) {
@@ -72,14 +100,14 @@ const Add = () => {
   if (loading) return <Loader />;
 
   return (
-    <Card className="max-w-lg mx-auto mt-10">
+    <Card className="max-w-lg mx-auto mt-10 bg-blue-50">
       <CardHeader>
         <CardTitle className="text-center">Add Product</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">*Name</Label>
             <Input
               type="text"
               id="name"
@@ -121,12 +149,30 @@ const Add = () => {
 
           <div>
             <Label htmlFor="sku">Sku</Label>
-            <Input
-              id="sku"
-              {...register("sku")}
-              placeholder="Enter sku"
-            />
+            <Input id="sku" {...register("sku")} placeholder="Enter sku" />
             <ErrorMessage errors={errors} name="sku" />
+          </div>
+
+          <div className="py-7">
+            <Label htmlFor="categories">Categories</Label>
+            <div className="overflow-y-scroll h-30 mt-5">
+              <ul>
+                {categories.data &&
+                  categories.data.map((category) => (
+                    <li key={category.id} className="flex justify-left">
+                      <input
+                        type="checkbox"
+                        value={category.id}
+                        id={category.id}
+                        {...register("categories", { valueAsArray: true })}
+                        className="mr-5 mb-2"
+                      />
+                      <Label htmlFor={`${category.id}`}>{category?.name}</Label>
+                    </li>
+                  ))}
+              </ul>
+              <ErrorMessage errors={errors} name="categories" />
+            </div>
           </div>
 
           <div className={imagePreview ? `hidden` : `block`}>

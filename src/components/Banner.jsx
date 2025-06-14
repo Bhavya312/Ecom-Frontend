@@ -1,4 +1,4 @@
-import previewImage from "../../src/assets/homeslider/preview.webp";
+import previewImage from "../../src/assets/homeslider/purple-background.jpg";
 
 const Banner = ({name, catImage}) => {
   
